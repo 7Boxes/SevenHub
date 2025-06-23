@@ -462,7 +462,7 @@ local scriptConfigs = {
     -- Seed Auto-Buyer
     {
         tabName = "Seed Auto-Buyer",
-        githubUrl = "https://raw.githubusercontent.com/yourusername/yourrepo/main/seed_autobuyer.lua",
+        githubUrl = "https://raw.githubusercontent.com/7Boxes/SevenHub/refs/heads/main/seeds.lua",
         initFunction = function(JMXTemplates, tabContent)
             -- This will be replaced by the GitHub script
         end
