@@ -1,4 +1,4 @@
--- JMX Executor UI Script with Dynamic Script Loading
+-- JMX Executor UI Script with GitHub Script Loading
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local localPlayer = Players.LocalPlayer
@@ -463,31 +463,28 @@ local scriptConfigs = {
     {
         tabName = "Seed Auto-Buyer",
         githubUrl = "https://raw.githubusercontent.com/7Boxes/SevenHub/refs/heads/main/seeds.lua",
-        initFunction = function(JMXTemplates, tabContent)
-            -- This will be replaced by the GitHub script
-        end
+        initFunction = nil -- Will be loaded from GitHub
     },
     
     -- Auto Trowel Purchaser
     {
         tabName = "Auto Trowel",
         githubUrl = "https://raw.githubusercontent.com/7Boxes/SevenHub/refs/heads/main/freetrowel.lua",
-        initFunction = function(JMXTemplates, tabContent)
-            -- This will be replaced by the GitHub script
-        end
+        initFunction = nil -- Will be loaded from GitHub
     },
     
     -- User & Weather Updater
     {
         tabName = "User Stats",
         githubUrl = "https://raw.githubusercontent.com/7Boxes/SevenHub/refs/heads/main/weatherupdater.lua",
-        initFunction = function(JMXTemplates, tabContent)
-            -- This will be replaced by the GitHub script
-        end
+        initFunction = nil -- Will be loaded from GitHub
     }
 }
 
--- Function to load and initialize scripts
+-- =====================================================================
+-- SCRIPT LOADING FUNCTION WITH HTTPGET AND LOADSTRING
+-- =====================================================================
+
 local function loadScripts()
     for _, config in ipairs(scriptConfigs) do
         -- Create tab for this script
@@ -503,29 +500,36 @@ local function loadScripts()
         loadingText.TextSize = 14
         loadingText.Parent = tabContent
         
-        -- Try to load the script
-        local success, err = pcall(function()
-            -- In a real implementation, you would fetch the script from GitHub:
-            -- local scriptContent = game:GetService("HttpService"):GetAsync(config.githubUrl)
-            -- local initFunction = loadstring(scriptContent)()
+        -- Load the script in a separate thread
+        spawn(function()
+            local success, err = pcall(function()
+                -- Fetch the script from GitHub
+                local response = game:HttpGet(config.githubUrl, true)
+                
+                -- Load the script content
+                local initFunction = loadstring(response)()
+                
+                -- Initialize the script with the tab content
+                initFunction(JMXTemplates, tabContent)
+                
+                -- Remove loading text after successful initialization
+                loadingText:Destroy()
+            end)
             
-            -- But for this example, we'll just call the initFunction directly
-            config.initFunction(JMXTemplates, tabContent)
-            
-            -- Remove loading text after initialization
-            loadingText:Destroy()
+            if not success then
+                warn("Failed to load script: " .. config.tabName)
+                warn("Error: " .. tostring(err))
+                loadingText.Text = "Failed to load " .. config.tabName
+                loadingText.TextColor3 = Color3.new(1, 0, 0)
+            end
         end)
-        
-        if not success then
-            warn("Failed to load script: " .. config.tabName)
-            warn("Error: " .. tostring(err))
-            loadingText.Text = "Failed to load " .. config.tabName
-            loadingText.TextColor3 = Color3.new(1, 0, 0)
-        end
     end
 end
 
--- Initialize the scripts
+-- =====================================================================
+-- INITIALIZE THE SCRIPTS
+-- =====================================================================
+
 loadScripts()
 
 -- Return templates for any external scripts that might want to use them
