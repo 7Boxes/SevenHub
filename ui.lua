@@ -1,8 +1,7 @@
--- JMX Executor UI Script
+-- JMX Executor UI Script with Built-in Configuration
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
 local localPlayer = Players.LocalPlayer
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 
 -- Main UI Setup
 local JMX = Instance.new("ScreenGui")
@@ -452,5 +451,67 @@ function JMXTemplates.AddTab(tabName)
     return tabContent
 end
 
--- Make templates available to other scripts
+-- =====================================================================
+-- SCRIPT CONFIGURATION SECTION
+-- Add your scripts here with their GitHub URLs and initialization functions
+-- =====================================================================
+
+local scriptConfigs = {
+    {
+        tabName = "Farming Suite",
+        githubUrl = "https://raw.githubusercontent.com/yourusername/yourrepo/main/farming_script.lua",
+        initFunction = function(JMXTemplates, 
+    },
+    {
+        tabName = "Teleport",
+        githubUrl = "https://raw.githubusercontent.com/yourusername/yourrepo/main/teleport_script.lua",
+        initFunction = function(JMXTemplates, tabContent)
+}
+
+-- =====================================================================
+-- END OF CONFIGURATION SECTION
+-- =====================================================================
+
+-- Function to load and initialize scripts
+local function loadScripts()
+    for _, config in ipairs(scriptConfigs) do
+        -- Create tab for this script
+        local tabContent = JMXTemplates.AddTab(config.tabName)
+        
+        -- Create a loading indicator
+        local loadingText = Instance.new("TextLabel")
+        loadingText.Size = UDim2.new(1, 0, 0, 30)
+        loadingText.BackgroundTransparency = 1
+        loadingText.Text = "Loading " .. config.tabName .. "..."
+        loadingText.TextColor3 = Color3.new(1, 1, 1)
+        loadingText.Font = Enum.Font.Gotham
+        loadingText.TextSize = 14
+        loadingText.Parent = tabContent
+        
+        -- Try to load the script
+        local success, err = pcall(function()
+            -- In a real implementation, you would fetch the script from GitHub:
+            -- local scriptContent = game:GetService("HttpService"):GetAsync(config.githubUrl)
+            -- local initFunction = loadstring(scriptContent)()
+            
+            -- But for this example, we'll just call the initFunction directly
+            config.initFunction(JMXTemplates, tabContent)
+            
+            -- Remove loading text after initialization
+            loadingText:Destroy()
+        end)
+        
+        if not success then
+            warn("Failed to load script: " .. config.tabName)
+            warn("Error: " .. tostring(err))
+            loadingText.Text = "Failed to load " .. config.tabName
+            loadingText.TextColor3 = Color3.new(1, 0, 0)
+        end
+    end
+end
+
+-- Initialize the scripts
+loadScripts()
+
+-- Return templates for any external scripts that might want to use them
 return JMXTemplates
