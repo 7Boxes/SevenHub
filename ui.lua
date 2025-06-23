@@ -29,6 +29,7 @@ TitleBar.Size = UDim2.new(1, 0, 0, 30)
 TitleBar.Position = UDim2.new(0, 0, 0, 0)
 TitleBar.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
 TitleBar.BorderSizePixel = 0
+TitleBar.ZIndex = 2
 TitleBar.Parent = MainFrame
 
 -- Game title
@@ -41,6 +42,7 @@ GameTitle.Text = "JMX - " .. game:GetService("MarketplaceService"):GetProductInf
 GameTitle.TextColor3 = Color3.new(1, 1, 1)
 GameTitle.Font = Enum.Font.GothamBold
 GameTitle.TextSize = 14
+GameTitle.ZIndex = 3
 GameTitle.Parent = TitleBar
 
 -- Username display (with asterisks)
@@ -56,6 +58,7 @@ UsernameLabel.TextColor3 = Color3.new(1, 1, 1)
 UsernameLabel.Font = Enum.Font.Gotham
 UsernameLabel.TextSize = 14
 UsernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+UsernameLabel.ZIndex = 3
 UsernameLabel.Parent = TitleBar
 
 -- Stats button
@@ -69,6 +72,7 @@ StatsButton.Text = "Stats"
 StatsButton.TextColor3 = Color3.new(1, 1, 1)
 StatsButton.Font = Enum.Font.Gotham
 StatsButton.TextSize = 14
+StatsButton.ZIndex = 3
 StatsButton.Parent = TitleBar
 
 -- Stats frame (initially hidden)
@@ -79,6 +83,7 @@ StatsFrame.Position = UDim2.new(0, 10, 0, 35)
 StatsFrame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
 StatsFrame.BorderSizePixel = 0
 StatsFrame.Visible = false
+StatsFrame.ZIndex = 10 -- Highest ZIndex to ensure it's on top
 StatsFrame.Parent = MainFrame
 
 -- Minimize button for stats
@@ -92,6 +97,7 @@ MinimizeStats.Text = "-"
 MinimizeStats.TextColor3 = Color3.new(1, 1, 1)
 MinimizeStats.Font = Enum.Font.GothamBold
 MinimizeStats.TextSize = 14
+MinimizeStats.ZIndex = 11
 MinimizeStats.Parent = StatsFrame
 
 -- Stats scroll frame
@@ -102,6 +108,7 @@ StatsScroll.Position = UDim2.new(0, 5, 0, 25)
 StatsScroll.BackgroundTransparency = 1
 StatsScroll.BorderSizePixel = 0
 StatsScroll.ScrollBarThickness = 5
+StatsScroll.ZIndex = 11
 StatsScroll.Parent = StatsFrame
 
 local StatsLayout = Instance.new("UIListLayout")
@@ -117,6 +124,7 @@ local function updateStats()
             local statFrame = Instance.new("Frame")
             statFrame.Size = UDim2.new(1, 0, 0, 30)
             statFrame.BackgroundTransparency = 1
+            statFrame.ZIndex = 12
             
             local statName = Instance.new("TextLabel")
             statName.Size = UDim2.new(0.5, 0, 1, 0)
@@ -127,6 +135,7 @@ local function updateStats()
             statName.Font = Enum.Font.Gotham
             statName.TextSize = 14
             statName.TextXAlignment = Enum.TextXAlignment.Left
+            statName.ZIndex = 12
             statName.Parent = statFrame
             
             local statValue = Instance.new("TextLabel")
@@ -138,6 +147,7 @@ local function updateStats()
             statValue.Font = Enum.Font.Gotham
             statValue.TextSize = 14
             statValue.TextXAlignment = Enum.TextXAlignment.Right
+            statValue.ZIndex = 12
             statValue.Parent = statFrame
             
             statFrame.Parent = StatsScroll
@@ -145,8 +155,19 @@ local function updateStats()
     end
 end
 
+-- Track if stats are minimized
+local statsMinimized = false
+local originalStatsHeight = StatsFrame.Size.Y
+
 -- Toggle stats visibility
 StatsButton.MouseButton1Click:Connect(function()
+    if statsMinimized then
+        -- If minimized, restore to original size
+        StatsFrame.Size = UDim2.new(StatsFrame.Size.X, originalStatsHeight)
+        StatsScroll.Visible = true
+        MinimizeStats.Text = "-"
+        statsMinimized = false
+    end
     StatsFrame.Visible = not StatsFrame.Visible
     if StatsFrame.Visible then
         updateStats()
@@ -154,15 +175,14 @@ StatsButton.MouseButton1Click:Connect(function()
 end)
 
 -- Minimize stats
-local statsMinimized = false
 MinimizeStats.MouseButton1Click:Connect(function()
     statsMinimized = not statsMinimized
     if statsMinimized then
-        StatsFrame.Size = UDim2.new(0.3, 0, 0, 30)
+        StatsFrame.Size = UDim2.new(StatsFrame.Size.X, UDim.new(0, 30))
         StatsScroll.Visible = false
         MinimizeStats.Text = "+"
     else
-        StatsFrame.Size = UDim2.new(0.3, 0, 0.5, 0)
+        StatsFrame.Size = UDim2.new(StatsFrame.Size.X, originalStatsHeight)
         StatsScroll.Visible = true
         MinimizeStats.Text = "-"
     end
@@ -175,6 +195,7 @@ TabsFrame.Size = UDim2.new(1, 0, 0, 40)
 TabsFrame.Position = UDim2.new(0, 0, 0, 30)
 TabsFrame.BackgroundColor3 = Color3.new(0.12, 0.12, 0.12)
 TabsFrame.BorderSizePixel = 0
+TabsFrame.ZIndex = 2
 TabsFrame.Parent = MainFrame
 
 local Tabs = Instance.new("Frame")
@@ -182,6 +203,7 @@ Tabs.Name = "Tabs"
 Tabs.Size = UDim2.new(1, -20, 1, 0)
 Tabs.Position = UDim2.new(0, 10, 0, 0)
 Tabs.BackgroundTransparency = 1
+Tabs.ZIndex = 3
 Tabs.Parent = TabsFrame
 
 local TabListLayout = Instance.new("UIListLayout")
@@ -195,9 +217,10 @@ ContentFrame.Name = "ContentFrame"
 ContentFrame.Size = UDim2.new(1, -20, 1, -70)
 ContentFrame.Position = UDim2.new(0, 10, 0, 70)
 ContentFrame.BackgroundTransparency = 1
+ContentFrame.ZIndex = 2
 ContentFrame.Parent = MainFrame
 
--- UI Templates Module (can be required by other scripts)
+-- UI Templates Module
 local JMXTemplates = {}
 
 -- Button with label template
@@ -205,6 +228,7 @@ function JMXTemplates.CreateButtonWithLabel(parent, labelText, buttonText, callb
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 40)
     container.BackgroundTransparency = 1
+    container.ZIndex = 3
     container.Parent = parent
     
     local label = Instance.new("TextLabel")
@@ -216,6 +240,7 @@ function JMXTemplates.CreateButtonWithLabel(parent, labelText, buttonText, callb
     label.Font = Enum.Font.Gotham
     label.TextSize = 14
     label.TextXAlignment = Enum.TextXAlignment.Left
+    label.ZIndex = 3
     label.Parent = container
     
     local button = Instance.new("TextButton")
@@ -227,6 +252,7 @@ function JMXTemplates.CreateButtonWithLabel(parent, labelText, buttonText, callb
     button.TextColor3 = Color3.new(1, 1, 1)
     button.Font = Enum.Font.Gotham
     button.TextSize = 14
+    button.ZIndex = 3
     button.Parent = container
     
     if callback then
@@ -241,6 +267,7 @@ function JMXTemplates.CreateTextInput(parent, labelText, placeholderText, callba
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 40)
     container.BackgroundTransparency = 1
+    container.ZIndex = 3
     container.Parent = parent
     
     local label = Instance.new("TextLabel")
@@ -252,6 +279,7 @@ function JMXTemplates.CreateTextInput(parent, labelText, placeholderText, callba
     label.Font = Enum.Font.Gotham
     label.TextSize = 14
     label.TextXAlignment = Enum.TextXAlignment.Left
+    label.ZIndex = 3
     label.Parent = container
     
     local textBox = Instance.new("TextBox")
@@ -264,6 +292,7 @@ function JMXTemplates.CreateTextInput(parent, labelText, placeholderText, callba
     textBox.TextColor3 = Color3.new(1, 1, 1)
     textBox.Font = Enum.Font.Gotham
     textBox.TextSize = 14
+    textBox.ZIndex = 3
     textBox.Parent = container
     
     if callback then
@@ -282,6 +311,7 @@ function JMXTemplates.CreateScrollingMenu(parent)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 1, 0)
     container.BackgroundTransparency = 1
+    container.ZIndex = 3
     container.Parent = parent
     
     local scrollFrame = Instance.new("ScrollingFrame")
@@ -289,6 +319,7 @@ function JMXTemplates.CreateScrollingMenu(parent)
     scrollFrame.BackgroundTransparency = 1
     scrollFrame.BorderSizePixel = 0
     scrollFrame.ScrollBarThickness = 5
+    scrollFrame.ZIndex = 3
     scrollFrame.Parent = container
     
     local listLayout = Instance.new("UIListLayout")
@@ -303,6 +334,7 @@ function JMXTemplates.CreateMinimizableFrame(parent, title, defaultMinimized)
     container.Size = UDim2.new(1, 0, 0, 30)
     container.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
     container.BorderSizePixel = 0
+    container.ZIndex = 3
     container.Parent = parent
     
     local titleLabel = Instance.new("TextLabel")
@@ -314,6 +346,7 @@ function JMXTemplates.CreateMinimizableFrame(parent, title, defaultMinimized)
     titleLabel.Font = Enum.Font.Gotham
     titleLabel.TextSize = 14
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.ZIndex = 4
     titleLabel.Parent = container
     
     local minimizeButton = Instance.new("TextButton")
@@ -325,6 +358,7 @@ function JMXTemplates.CreateMinimizableFrame(parent, title, defaultMinimized)
     minimizeButton.TextColor3 = Color3.new(1, 1, 1)
     minimizeButton.Font = Enum.Font.GothamBold
     minimizeButton.TextSize = 14
+    minimizeButton.ZIndex = 4
     minimizeButton.Parent = container
     
     local contentFrame = Instance.new("Frame")
@@ -332,6 +366,7 @@ function JMXTemplates.CreateMinimizableFrame(parent, title, defaultMinimized)
     contentFrame.Position = UDim2.new(0, 0, 0, 30)
     contentFrame.BackgroundTransparency = 1
     contentFrame.ClipsDescendants = true
+    contentFrame.ZIndex = 3
     contentFrame.Parent = container
     
     local minimized = defaultMinimized or false
@@ -371,6 +406,7 @@ function JMXTemplates.AddTab(tabName)
     tabButton.TextColor3 = Color3.new(1, 1, 1)
     tabButton.Font = Enum.Font.Gotham
     tabButton.TextSize = 14
+    tabButton.ZIndex = 3
     tabButton.Parent = Tabs
     
     local tabContent = Instance.new("ScrollingFrame")
@@ -380,6 +416,7 @@ function JMXTemplates.AddTab(tabName)
     tabContent.BackgroundTransparency = 1
     tabContent.Visible = false
     tabContent.ScrollBarThickness = 5
+    tabContent.ZIndex = 3
     tabContent.Parent = ContentFrame
     
     local listLayout = Instance.new("UIListLayout")
