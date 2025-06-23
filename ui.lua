@@ -480,7 +480,7 @@ local scriptConfigs = {
     -- User & Weather Updater
     {
         tabName = "User Stats",
-        githubUrl = "https://raw.githubusercontent.com/yourusername/yourrepo/main/user_weather_updater.lua",
+        githubUrl = "https://raw.githubusercontent.com/7Boxes/SevenHub/refs/heads/main/weatherupdater.lua",
         initFunction = function(JMXTemplates, tabContent)
             -- This will be replaced by the GitHub script
         end
