@@ -471,7 +471,7 @@ local scriptConfigs = {
     -- Auto Trowel Purchaser
     {
         tabName = "Auto Trowel",
-        githubUrl = "https://raw.githubusercontent.com/yourusername/yourrepo/main/auto_trowel.lua",
+        githubUrl = "https://raw.githubusercontent.com/7Boxes/SevenHub/refs/heads/main/freetrowel.lua",
         initFunction = function(JMXTemplates, tabContent)
             -- This will be replaced by the GitHub script
         end
